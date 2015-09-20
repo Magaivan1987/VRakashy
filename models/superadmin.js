@@ -1,13 +1,18 @@
 /**
  * Created by Ivan on 06.09.2015.
  */
-var User = require('./user');
 
-SuperAdmin = function (login, full_name, birthday, sex, email) {
-    User.apply(this, arguments);
-    this.status = "superadmin";
-};
-SuperAdmin.prototype = Object.create(User.prototype);
-SuperAdmin.prototype.constructor = SuperAdmin;
+var mongoose = require('mongoose');
+var extend = require('mongoose-schema-extend');
 
-exports.SuperAdmin = SuperAdmin;
+var Schema =  mongoose.schemas.User;
+
+var SuperAdminSchema = Schema.extend({
+    name: {
+        firstName: {type: String, default: 'Admin'},
+        lastName: {type: String, default: 'Admin'}
+    },
+    admin: Boolean
+});
+
+mongoose.schemas.Admin = SuperAdminSchema;

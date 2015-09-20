@@ -1,30 +1,38 @@
 /**
- * Created by Ivan on 06.09.2015.
+ * Created by Ivan on 01.09.2015.
  */
-User = function (login, full_name, birthday, sex, email) {
-    this.id = ++counterID,
-        this.login = login,
-        this.full_name = full_name,
-        this.birthday = birthday,
-        this.sex = sex,
-        this.email = email,
-        this.status = 'user',
-        //метод зміна імені
-        this.changeFull_name = function (newFull_name) {
-            this.full_name = newFull_name;
-            return 'New Full_name Saved: ' + this.full_name;
-        },
-        //метод зміна дати народження
-        this.changeBirthday = function (newBirthday) {
-            this.birthday = newBirthday;
-            return 'New Birthday Saved: ' + this.birthday;
-        },
-        //метод зміна електронної адреси
-        this.changeEmail = function (newEmail) {
-            this.email = newEmail;
-            return 'New Email Saved: ' + this.email;
-        };
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var UserSchema = Schema({
+    id: false,
+    _id: Number,
+    name: {
+        firstName: {type: String, default: 'NoName'},
+        lastName: {type: String, default: 'NoName'}
+    },
+    email: {type: String, unique: true},
+    sex: {type: String, unique: true},
+    birthday: {type: Date, default: Date.now()},
+    posts: [{type: Number, ref:'Post'}],
+    age: Number,
+    status: {type: String, default: 'user'}
+    //login: {type: String, unique: true},
+   // password: {type: String}
+}, {collection: 'User', version: false});
 
-};
+UserSchema.pre('save', function(next){
+    var dOb = this. birthday;
 
-exports.User = User;
+    this.age = (new Date() - new Date(dOb)) / 1000 / 60 / 60 / 24;
+
+    next();
+});
+
+UserSchema.virtual('fullName').get(function(){
+    return this.name.first + ' ' + this.name.last
+});
+
+UserSchema.set('toJSON', { virtuals: true });
+
+mongoose.schemas.User = UserSchema;
+
